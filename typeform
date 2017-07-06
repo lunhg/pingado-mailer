@@ -1,0 +1,39 @@
+#! /usr/bin/env node
+
+"use strict"
+
+// Bibliotecas
+let request = require('request-json');
+let chalk = require('chalk');
+let rl = require('readline');
+let each = require('foreach');
+
+// Typescript requer um UUID para o formulario e uma chave de acesso
+let client = request.createClient('https://api.typeform.com/v1/')
+
+let args = process.argv;
+args.splice(0,2);
+
+if(args[0] == '--help'){
+    console.log('typeform API CLI: ');
+    console.log('  usage: typeform --uuid [uuid] --key [API key]');
+    console.log('  --uuid [uuid]      the uuid of typeform');
+    console.log('  --key  [API key]   the api key of your account');
+}
+else{
+    let _args = {}
+    each(args, function(v,i,a){
+	if(i%2==0){
+	    _args[v.split('--')[1]] = args[i+1];
+	}
+    });
+    
+    client.get(`form/${_args.uuid}?key=${_args.key}&completed=true`, function(err, res, body) {
+	if(err) console.log(chalk.red(err));
+	console.log(chalk.green(`GET form /form/${_args.uuid}: ${res.statusCode}`));
+	console.log(body);
+    });
+}
+
+
+
