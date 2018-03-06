@@ -1,20 +1,29 @@
-const mailer = require('../index')
-const dotenv = require('dotenv')
+const path = require('path');
+const dotenv = require('dotenv');
 
 describe("Testing mailer", function(){
 
-    dotenv.config()
-
+    let mailer = null;
+    
+    before(function(){
+	dotenv.config({path:path.join(__dirname, '..', '.env')});
+	mailer = require('../index')({
+	    api_key: process.env.API_KEY,
+	    domain: process.env.DOMAIN
+	})
+    })
+    
     it("should send test mail", function(){
-	let data = {
-	    from: 'Mailgun postmaster <'+process.env.POSTMASTER+'>',
+	return mailer.send({
+	    from: 'Mailgun postmaster <postmaster\@'+process.env.DOMAIN+'>',
 	    to: process.env.TO,
 	    subject: 'Hello',
 	    text: 'Testing some Mailgun awesomeness!'
-	}
-	mailer.send(data, {
-	    api_key: process.env.API_KEY,
-	    domail: process.env.DOMAIN
+	}).then(function(body){
+	    console.log(body)
+	}).catch(function(err){
+	    console.log(err)
 	})
     })
 })
+
