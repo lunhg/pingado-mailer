@@ -1,5 +1,6 @@
 const path = require('path');
 const dotenv = require('dotenv');
+const should = require('should');
 
 describe("Testing mailer", function(){
 
@@ -8,14 +9,13 @@ describe("Testing mailer", function(){
     before(function(){
 	dotenv.config({path:path.join(__dirname, '..', '.env')});
 	mailer = require('../index')({
-	    api_key: process.env.API_KEY,
-	    domain: process.env.DOMAIN
+	    api_key: 'API_KEY',
+	    domain: 'DOMAIN'
 	})
     })
     
     it("should send test mail", function(){
 	return mailer.send({
-	    from: 'Mailgun postmaster <postmaster\@'+process.env.DOMAIN+'>',
 	    to: process.env.TO,
 	    subject: 'Hello',
 	    text: 'Testing some Mailgun awesomeness!'
@@ -23,6 +23,26 @@ describe("Testing mailer", function(){
 	    console.log(body)
 	}).catch(function(err){
 	    console.log(err)
+	})
+    })
+
+    it("should list mails", function(){
+	return mailer.list().then(function(body){
+	    body.should.have.property('items')
+	}).catch(function(err){
+	    console.log(err)
+	})
+    })
+
+    it("should read the last mail", function(){
+	return new Promise(function(resolve, reject){
+	    setTimeout(function(){
+		mailer.list().then(function(body){
+		    return mailer.read(body["items"][body["items"].length-1])
+		}).then(function(body){
+		    console.log(body)
+		}).then(resolve).catch(reject)
+	    }, 5000)
 	})
     })
 })
