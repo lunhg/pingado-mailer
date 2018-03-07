@@ -1,6 +1,6 @@
 {
   "name": "pingado-mailer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "mailer for pingado project",
   "main": "index.js",
   "directories": {
