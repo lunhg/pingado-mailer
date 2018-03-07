@@ -53,6 +53,21 @@ class Mailer {
 	})
     }
 
+    page(list, key){
+	let that = this
+	return new Promise(function(resolve, reject){
+	    let url = list.paging[key].replace(/api\.mailgun\.net/, `api:${process.env[that.api_key]}\@api.mailgun.net`)
+	    console.log(url)
+	    request({
+		method:'GET',
+		uri: url
+	    }, function(err, res){
+		if(err) reject(err)
+		resolve(JSON.parse(res.body))
+	    })
+	})
+    }
+    
     read(item){
 	let that = this
 	return new Promise(function(resolve, reject){

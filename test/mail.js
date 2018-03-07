@@ -26,7 +26,7 @@ describe("Testing mailer", function(){
 	})
     })
 
-    it("should list mails", function(){
+    it("should list first mail page", function(){
 	return mailer.list().then(function(body){
 	    body.should.have.property('items')
 	}).catch(function(err){
@@ -34,15 +34,61 @@ describe("Testing mailer", function(){
 	})
     })
 
-    it("should read the last mail", function(){
-	return new Promise(function(resolve, reject){
-	    setTimeout(function(){
-		mailer.list().then(function(body){
-		    return mailer.read(body["items"][body["items"].length-1])
-		}).then(function(body){
-		    console.log(body)
-		}).then(resolve).catch(reject)
-	    }, 5000)
+    it("should page to the next page", function(){
+	return mailer.list().then(function(list){
+	    return mailer.page(list, 'next')
+	}).then(function(body){
+	    body.should.have.property('items')
+	}).catch(function(err){
+	    console.log(err)
+	})
+	    })
+
+    it("should page to the next page and return to previous page", function(){
+	return mailer.list().then(function(list){
+	    return mailer.page(list, 'next')
+	}).then(function(list){
+	    return mailer.page(list, 'previous')
+	}).then(function(body){
+	    body.should.have.property('items')
+	}).catch(function(err){
+	    console.log(err)
+	})
+	    })
+
+    it("should page to the last page and return to first page", function(){
+	return mailer.list().then(function(list){
+	    return mailer.page(list, 'last')
+	}).then(function(list){
+	    return mailer.page(list, 'first')
+	}).then(function(body){
+	    body.should.have.property('items')
+	}).catch(function(err){
+	    console.log(err)
+	})
+	    })
+
+    it("should read the first message in the last page", function(){
+	return mailer.list().then(function(list){
+	    return mailer.page(list, 'last')
+	}).then(function(list){
+	    return mailer.read(list["items"][0])
+	}).then(function(body){
+	    console.log(body)
+	}).catch(function(err){
+	    console.log(err)
+	})
+	    })
+
+    it("should read the first message in the last page", function(){
+	return mailer.list().then(function(list){
+	    return mailer.page(list, 'last')
+	}).then(function(list){
+	    return mailer.read(list["items"][list["items"].length-1])
+	}).then(function(body){
+	    console.log(body)
+	}).catch(function(err){
+	    console.log(err)
 	})
     })
 })
